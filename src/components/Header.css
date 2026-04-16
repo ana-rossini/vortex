@@ -53,3 +53,23 @@
     align-items: center;
     gap: 20px;
 }
+
+.search-bar {
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  gap: 10px;
+  width: 350px;
+  border: 1px solid transparent;
+  transition: 0.3s;
+}
+
+.search-bar input {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  width: 100%;
+}
