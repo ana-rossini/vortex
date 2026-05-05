@@ -1,50 +1,49 @@
-import React, { useState, useEffect } from "react"; // Adicionado o import do useState
-import { Sidebar } from "./components/Sidebar";
-import { Header } from "./components/Header";
+import { useState, useEffect } from 'react';
+import { Header } from './components/header';
 import { gameData } from "./data/games";
-import { GameCard } from "./components/GameCard";
+import { GameCard } from './components/GameCard';
+import { GameModal } from "./components/GameModal";
+import Sidebar from './components/Sidebar';
 import AOS from 'aos';
-import "aos/dist/aos.css";
-import "./App.css";
+import "aos/dist/aos.css"
+import './App.css';
 
-export default function App() {
+function App() {
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState('dash');
-  const filteredGames = gameData.filter((game) => {
-    const matchesSearch = game.title.toLowerCase().includes(search.toLowerCase());
+  const [activeTab, setActiveTab] = useState("dash");
+  const [favorites, setFavorites] = useState([]);
 
-    useEffect(() => {
-      AOS.init({
-        duration: 1000,
-        once:false,
-        easing: "ease-in-out",
-      })
-    })
-  
-    if (activeTab === "favorites") {
-      return matchesSearch && game.isFavorite; 
-    }
-    
-    return matchesSearch;
-  });
+  const [selectedGame, setSelectedGame] = useState(null);
+
+  const filteredGames = gameData
+    .filter((game) => activeTab === "dash" ? game : favorites.includes(game.id))
+    .filter((game) => game.title.toLowerCase().includes(search.toLowerCase()));
+
+  function toogleFavorite(gameId) {
+    setFavorites(favorites.includes(gameId) ? favorites.filter((id) => id !== gameId) : [...favorites, gameId])
+  }
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: false,
+      easing: "ease-in-out",
+    });
+  }, []);
 
   return (
-    <div className="vortex-app">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab}/>
+    <div className='vortex-app'>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="vortex-main">
         <Header search={search} setSearch={setSearch} />
 
         <div className="vortex-content">
+
           <h2 className="section-title">
-            {/* Corrigida a sintaxe das aspas abaixo */}
-            {activeTab === 'dash' && 'Dashboard'}
-            {activeTab === 'favorites' && 'Favoritos'}
-            {activeTab === 'profile' && 'Perfil'}
-            
-            <small style={{ marginLeft: '10px', fontSize: '0.6em', opacity: 0.8 }}>
-              {search ? ` | Resultados para: ${search}` : ' | Todos os Jogos'}
-            </small>
+            {activeTab === "dash" && "Dashboard"}
+            {activeTab === "favorites" && "Favoritos"}
+            {activeTab === "profile" && "Perfil"}
           </h2>
 
           <div className="vortex-grid">
@@ -56,14 +55,29 @@ export default function App() {
                   category={g.category}
                   banner={g.banner}
                   index={index}
+                  isFavorite={favorites.includes(g.id)}
+                  onFavorite={() => toogleFavorite(g.id)}
+                  onPlay={() => setSelectedGame(g)}
                 />
               ))
             ) : (
-              <p className="no-results">Nenhum jogo encontrado.</p>
+              <p style={{ color: "#94a3b8" }}>
+                Nenhum filme encontrado....
+              </p>
             )}
           </div>
+
         </div>
       </main>
+
+      {selectedGame && (
+        <GameModal
+          game={selectedGame}
+          onClose={() => setSelectedGame(null)}
+        />
+      )}
     </div>
   );
 }
+
+export default App;
